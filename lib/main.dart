@@ -1,56 +1,91 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+/*
+Harrison Stadler
+Mobile App Dev
+CSC 4360 
+HW02 - CalculatorApp
+*/
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:window_size/window_size.dart';
 
-void main() {
-  setupWindow();
-  runApp(
-    // Provide the model to all widgets within the app. We're using
-    // ChangeNotifierProvider because that's a simple way to rebuild
-    // widgets when a model changes. We could also just use
-    // Provider, but then we would have to listen to Counter ourselves.
-    //
-    // Read Provider's docs to learn about all the available providers.
-    ChangeNotifierProvider(
-      // Initialize the model in the builder. That way, Provider
-      // can own Counter's lifecycle, making sure to call `dispose`
-      // when not needed anymore.
-      create: (context) => Counter(),
-      child: const MyApp(),
-    ),
-  );
-}
+void main() => runApp(const CalculatorApp());
 
-const double windowWidth = 360;
-const double windowHeight = 640;
+class CalculatorApp extends StatelessWidget {
+  const CalculatorApp({super.key});
 
-void setupWindow() {
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-    WidgetsFlutterBinding.ensureInitialized();
-    setWindowTitle('Provider Counter');
-    setWindowMinSize(const Size(windowWidth, windowHeight));
-    setWindowMaxSize(const Size(windowWidth, windowHeight));
-    getCurrentScreen().then((screen) {
-      setWindowFrame(Rect.fromCenter(
-        center: screen!.frame.center,
-        width: windowWidth,
-        height: windowHeight,
-      ));
-    });
+  @override
+  Widget build(BuildContext context) {
+    // Main widget that sets up the Material App for the calculator.
+    return MaterialApp(
+      title: 'Basic Calculator',
+      home: Scaffold(
+        appBar: AppBar(title: const Text('Basic Calculator')), // App bar at the top.
+        body: const CalculatorHome(), // Body of the app which contains the calculator's functionality.
+      ),
+    );
   }
 }
 
-/// Simplest possible model, with just one field.
-///
-/// [ChangeNotifier] is a class in `flutter:foundation`. [Counter] does
-/// _not_ depend on Provider.
-class Counter with ChangeNotifier {
-  int value = 0;
+class CalculatorHome extends StatefulWidget {
+  const CalculatorHome({super.key});
 
-  void increment() {
-    value += 1;
-    notifyListeners();
+  @override
+  _CalculatorHomeState createState() => _CalculatorHomeState();
+}
+
+class _CalculatorHomeState extends State<CalculatorHome> {
+  String _display = ''; // This string holds the digits and operations entered by the user.
+
+  // Method that updates the display whenever a button is pressed.
+  void _onPressed(String value) {
+    setState(() {
+      _display += value; // Append the pressed button's value to the display string.
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            alignment: Alignment.bottomRight,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24), // Adjusted padding to better fit the display.
+            child: Text(
+              _display,
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold), // Adjusted font size to prevent clipping.
+              overflow: TextOverflow.visible, // Ensures text does not get clipped.
+            ),
+          ),
+        ),
+        ..._buildButtonRows(), // Builds the rows of buttons dynamically.
+      ],
+    );
+  }
+
+  // Helper method to create rows of buttons based on a predefined list.
+  List<Widget> _buildButtonRows() {
+    const buttons = [
+      ['7', '8', '9', '/'],
+      ['4', '5', '6', '*'],
+      ['1', '2', '3', '-'],
+      ['C', '0', '=', '+'],
+    ]; // Each sub-array represents a row of buttons on the calculator.
+    return buttons.map((row) {
+      return Expanded(
+        child: Row(
+          children: row.map((label) {
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(2),
+                child: ElevatedButton(
+                  onPressed: () => _onPressed(label), // Handle press event.
+                  child: Text(label, style: const TextStyle(fontSize: 24)), // Style of the button labels.
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    }).toList();
   }
 }
