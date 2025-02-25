@@ -9,25 +9,25 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(const CalculatorApp());
 
-// Main widget for the application. Sets up the theme and structure of the app.
+// Main app widget that initializes and runs the app.
 class CalculatorApp extends StatelessWidget {
   const CalculatorApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // MaterialApp is the root of your app that follows the Material Design.
+    // MaterialApp is the root widget of your app. It provides a context for Material Design.
     return MaterialApp(
       title: 'Basic Calculator',
-      // Scaffold provides a framework for material design layouts with app bars, body, etc.
+      // Scaffold provides the high-level structure for a screen.
       home: Scaffold(
-        appBar: AppBar(title: const Text('Basic Calculator')), // Top app bar with title.
-        body: const CalculatorHome(), // Main content of the app where the calculator is displayed.
+        appBar: AppBar(title: const Text('Basic Calculator')),  // Title displayed in the AppBar.
+        body: const CalculatorHome(), // Body containing the main functionality of the calculator.
       ),
     );
   }
 }
 
-// Stateful widget for the calculator home screen that manages state of inputs and calculations.
+// Stateful widget that manages the state of the calculator operations.
 class CalculatorHome extends StatefulWidget {
   const CalculatorHome({super.key});
 
@@ -36,40 +36,39 @@ class CalculatorHome extends StatefulWidget {
 }
 
 class _CalculatorHomeState extends State<CalculatorHome> {
-  String _display = '0'; // Displayed text in the calculator screen, starts with '0'.
+  String _display = '0';  // The text displayed on the calculator screen.
 
-  // Variables to store the first operand, the second operand, and the operator.
+  // Variables to store the operands and the operator for calculations.
   double? _firstOperand;
   double? _secondOperand;
   String? _operator;
 
-  // Method that handles logic when a button is pressed.
+  // Method to handle button presses, updating the state based on the input.
   void _onPressed(String value) {
     setState(() {
-      if ('0123456789'.contains(value)) {
-        // Handles numeric button press.
+      if (value == 'C') {
+        _clear();  // Clears the display and resets the operation if 'C' is pressed.
+      } else if ('0123456789'.contains(value)) {
+        // Handles numeric input by updating the display with the pressed number.
         _display = _display == '0' ? value : _display + value;
       } else if ('+-*/'.contains(value)) {
-        // Handles operation button press (e.g., +, -, *, /).
-        _firstOperand = double.parse(_display); // Store the current number as the first operand.
-        _operator = value; // Store the operator.
-        _display = '0'; // Reset display for the next number.
+        // Sets the first operand and the operator for the calculation.
+        _firstOperand = double.parse(_display);
+        _operator = value;
+        _display = '0'; // Clears the display for the next number.
       } else if (value == '=') {
-        // Handles equals button press.
+        // Triggers the calculation when '=' is pressed.
         if (_firstOperand != null && _operator != null && _display != '0') {
-          _secondOperand = double.parse(_display); // Store the current number as the second operand.
-          _calculate(); // Perform the calculation.
+          _secondOperand = double.parse(_display);
+          _calculate();
         }
-      } else if (value == 'C') {
-        // Handles clear button press.
-        _clear(); // Clear the display and reset variables.
       }
     });
   }
 
-  // Method that calculates the result based on the operator and operands.
+  // Performs the arithmetic calculation based on the operator and updates the display.
   void _calculate() {
-    double result = 0; // Result of the calculation.
+    double result = 0; // Initializes the result variable.
     switch (_operator) {
       case '+':
         result = _firstOperand! + _secondOperand!;
@@ -84,18 +83,18 @@ class _CalculatorHomeState extends State<CalculatorHome> {
         if (_secondOperand != 0) {
           result = _firstOperand! / _secondOperand!;
         } else {
-          _display = 'Error - divide by zero'; // Handle divide by zero error.
+          _display = 'Error - divide by zero';  // Handles division by zero error.
           return;
         }
         break;
     }
-    _display = result.toString(); // Display the result.
-    _firstOperand = null; // Reset the first operand.
-    _operator = null; // Reset the operator.
-    _secondOperand = null; // Reset the second operand.
+    _display = result.toString();  // Updates the display with the result.
+    _firstOperand = null; // Clears the first operand for new calculations.
+    _operator = null; // Clears the operator.
+    _secondOperand = null; // Clears the second operand.
   }
 
-  // Method that clears all variables and resets the display.
+  // Clears the display and all calculations.
   void _clear() {
     _display = '0';
     _firstOperand = null;
@@ -119,12 +118,12 @@ class _CalculatorHomeState extends State<CalculatorHome> {
             ),
           ),
         ),
-        ..._buildButtonRows(), // Generate rows of buttons.
+        ..._buildButtonRows(),  // Dynamically generates rows of buttons for the calculator.
       ],
     );
   }
 
-  // Generates rows of calculator buttons.
+  // Generates rows of calculator buttons dynamically.
   List<Widget> _buildButtonRows() {
     const buttons = [
       ['7', '8', '9', '/'],
@@ -141,7 +140,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
                 padding: const EdgeInsets.all(2),
                 child: ElevatedButton(
                   onPressed: () => _onPressed(label),
-                  child: Text(label, style: const TextStyle(fontSize: 24)),
+                  child: Text(label, style: const TextStyle(fontSize: 24)),  // Styling and function binding for each button.
                 ),
               ),
             );
